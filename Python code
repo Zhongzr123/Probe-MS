@@ -308,7 +308,33 @@ def main():
     mzA = round(float(input('\nReporter A m/z (e.g., 126): ').strip()), 4)
     mzB = round(float(input('Reporter B m/z (e.g., 127): ').strip()), 4)
 
-    print(f'\nSearching for: A={mzA:.4f}, B={mzB:.4f} (10ppm, 1e5 threshold)')
+    while True:
+        s = input('ppm tolerance (default 10): ').strip()
+        if not s:
+            tol_ppm = 10.0
+            break
+        try:
+            tol_ppm = float(s)
+            if tol_ppm > 0:
+                break
+        except:
+            pass
+        print('  need a positive number')
+
+    while True:
+        s = input('Reporter intensity threshold (default 1e5): ').strip()
+        if not s:
+            thresh = 1e5
+            break
+        try:
+            thresh = float(s)
+            if thresh > 0:
+                break
+        except:
+            pass
+        print('  need a positive number')
+
+    print(f'\nSearching for: A={mzA:.4f}, B={mzB:.4f} ({tol_ppm:g}ppm, {thresh:g} threshold)')
     print('-' * 60)
 
     out_dir = os.path.join(folder, 'reporter_clusters')
@@ -329,7 +355,7 @@ def main():
             continue
 
         print('  Searching MS2 spectra...')
-        res = parser.scan(mzA, mzB, thresh=1e5, tol_ppm=10)
+        res = parser.scan(mzA, mzB, thresh=thresh, tol_ppm=tol_ppm)
 
         if not res:
             print('  No hits')
